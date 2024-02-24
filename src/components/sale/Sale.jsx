@@ -18,6 +18,9 @@ import Sheet from '@mui/joy/Sheet';
 import ModalClose from '@mui/joy/ModalClose';
 import Input from '@mui/joy/Input';
 import SearchIcon from '@mui/icons-material/Search';
+import jsPDF from "jspdf";
+import moment from "moment";
+import numWords from "num-words";
 
 
 const DrawerHeader = styled("div")(({ theme }) => ({
@@ -133,6 +136,13 @@ const Sale = () => {
   const [custFound, setCustFound] = useState(undefined);
   const [payment, setPayment] = useState(false);
   const [open, setOpen] = useState(false);
+  const [bill, setBill] = useState();
+  const [content, setContent] = useState([]);
+  const [userData, setUserData] = useState({
+    name: "Aryaan",
+    email: "aryaan@gmail.com",
+    phoneNumber: "123456789"
+  });
   const [complete, setComplete] = useState(false);
 
   const host = "http://localhost:5001"
@@ -202,22 +212,35 @@ const Sale = () => {
       total: item.total.toString()
     }));
 
+    setContent(contents)
+
+    const T = parseInt(price) + parseInt((price * 18 / 100).toFixed(1))
+    console.log("Total: ",T)
 
     const invoice = {
       contents: contents,
       gst: (price * 18 / 100).toFixed(1),
-      total: price,
+      taxable: price,
+      total: T,
       transactionId: "",
       type: type,
-      status: "",
+      status: "incomplete",
+      customer: userData
     }
 
+    setBill(invoice)
     paymentComplete(invoice)
 
     console.log("payment done")
     setOpen(false)
-
+    setPayment(false)
   }
+
+  useEffect(() => {
+    if (bill && bill.gst) {
+      generatePDF();
+    }
+  }, [bill]);
 
   const searchCustomer = async() => {
     if(custNo) {
@@ -229,8 +252,10 @@ const Sale = () => {
           'auth-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQ4MGFjOTQ1ZDk2YWU5ZmUzOTdlN2U5In0sImlhdCI6MTY4NjIwMDYxMH0._RXLrE3g9RTlVC7MU6RMR64iOPkoioIb378qlboLFgM',
         },
       });
+
       if(response.status == 200) {
         const resp = await response.json()
+        setUserData(resp)
         console.log("Data present")
         console.log(resp)
         setPayment(true)
@@ -273,6 +298,32 @@ const Sale = () => {
         console.log("Data Exists")
       }
     }
+  }
+
+  const toTitleCase = (str) => {
+    return str
+      .toLowerCase()
+      .split(' ')
+      .map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      })
+      .join(' ');
+  }
+
+  // const finalTotal = toTitleCase(numWords(total))
+
+  const generatePDF = () => {
+    const doc = new jsPDF("p", "pt", "a4");
+    doc.html(document.querySelector("#bill"), {
+      callback: function (pdf) {
+        const pageCount = doc.internal.getNumberOfPages();
+        console.log(pageCount)
+        doc.deletePage(pageCount)
+        pdf.save("bill.pdf")
+      }
+    })
+    console.log("download")
+    setBill(undefined)
   }
 
 return (
@@ -396,6 +447,160 @@ return (
       )}
     </Sheet>
   </Modal>
+
+  {/* Invoice */}
+  {bill ? (
+      <Card style={{
+        margin: 20,
+        display: 'none'
+      }}>
+        <div className="wholePrintBody page-break" id="bill" style={{marginBottom: 0}}>
+          <header style={{marginTop: 125}}>
+            <div className="allBorder">
+              <section className="leftSection ">
+                <p style={{margin: 5, fontSize: 14, fontWeight: 'bold'}}>OMKAR CREATIONS</p>
+                <p className="address" style={{margin: 5}}>
+                  A-401 Prakriti Aprt, M.S. Road, Mittal Park,<br/>
+                  Raghunath Nagar, Thane(W),<br/>
+                  Dist.Thane-400604,Maharashtra
+                </p>
+                <p style={{margin: 5}}>
+                  <b>Mob</b>
+                  <label className="ph_no">8779674027</label>
+                </p>
+              </section>
+              <section className="rightSection ">
+                <table style={{margin: 5}}>
+                  <tr>
+                    <td>Invoice No.</td>
+                    <td>
+                      <label>Bill No</label>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Date</td>
+                    <td>
+                      <label>{moment(new Date()).format('DD/MM/YYYY')}</label>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>GST No.</td>
+                    <td>
+                      <label>27AFFPV7912N1ZP</label>
+                    </td>
+                  </tr>
+                </table>
+              </section>
+              <div className="clearfix"></div>
+            </div>
+          </header>
+          <br/>
+          <main>
+            <section className="medicalDetails allBorder">
+              <div>
+                <div style={{margin: 5, fontSize: 14, fontWeight: 'bold'}}>BUYER</div>
+                <div style={{fontWeight: 'bold', fontSize: 14, marginLeft: 5}}>{userData.name}</div>
+                <div className="buyer-address" style={{marginLeft: 5}}>
+                  {userData.email}<br/>
+                  {userData.phoneNumber}<br/>
+                </div>
+                <div className="clearfix"></div>
+              </div>
+            </section>
+            <section className="itemDetailSection allBorder">
+              <div>
+                <table cellSpacing="0" className="billProductDetailsTable bottomBorder">
+                  <thead>
+                  <tr>
+                    <th rowSpan="2" colSpan="2">Sr. No.</th>
+                    <th rowSpan="2" colSpan="5">Description</th>
+                    <th rowSpan="2" colSpan="2">HSN Code</th>
+                    <th rowSpan="2" colSpan="4">Rate</th>
+                    <th rowSpan="2" colSpan="2">Quantity</th>
+                    <th rowSpan="2" colSpan="4">Amount</th>
+                  </tr>
+                  {/* <tr>
+                    <th style={{borderLeft: "1px solid black"}}>Rate</th>
+                    <th>Amount</th>
+                    <th>Rate</th>
+                    <th>Amount</th>
+                  </tr> */}
+                  </thead>
+                  <tbody>
+                    {content.map((product, index) => (
+                      <tr key={index}>
+                        <td colSpan="2" style={{ borderBottom: '1px solid black' }}>{index + 1}</td>
+                        <td colSpan="5" style={{ borderBottom: '1px solid black' }}><b>{product.productName}</b><br/>{product.productCode}</td>
+                        <td colSpan="2" style={{ borderBottom: '1px solid black' }}></td>
+                        <td colSpan="4" style={{ borderBottom: '1px solid black', textAlign: "right"}}>{product.price}</td>
+                        <td colSpan="2" style={{ borderBottom: '1px solid black', textAlign: "center" }}>{product.qty}</td>
+                        <td colSpan="4" style={{ borderBottom: '1px solid black', textAlign: "right"}}>{product.price * product.qty}</td>
+                      </tr>
+                    ))}
+                    
+                    <tr>
+                      <th colSpan="11"></th>
+                      <th colSpan="4" style={{border: "1px solid black", borderBottom: "0px"}}>Taxable Amount</th>
+                      <th colSpan="4" style={{border: "1px solid black", borderBottom: "0px", fontSize: "10px", textAlign: "right"}}>{bill.taxable}</th>
+                    </tr>
+                    <tr>
+                      <th colSpan="11"></th>
+                      <th colSpan="4" style={{border: "1px solid black", borderBottom: "0px"}}>GST 18%</th>
+                      <th colSpan="4" style={{border: "1px solid black", borderBottom: "0px", fontSize: "10px", textAlign: "right"}}>{bill.gst}</th>
+                    </tr>
+                    <tr>
+                      <th colSpan="11"></th>
+                      <th colSpan="4" style={{border: "1px solid black", borderBottom: "0px"}}>Total</th>
+                      <th colSpan="4" style={{border: "1px solid black", borderBottom: "0px", fontSize: "10px", textAlign: "right"}}>{bill.total}</th>
+                    </tr>
+                  </tbody>
+
+                </table>
+                <p>Amount Chargable(in words): {toTitleCase(numWords(bill.total))} Only.</p>
+              </div>
+              <div className="terminology topBorder">
+                <div>
+                  <table className="terminologyLeftTable">
+                    <h3 className="bank-details">Bank Details</h3>
+                    <tr>
+                      <td>Bank:</td>
+                      <td colSpan={2}>Punjab & Sind Bank</td>
+                    </tr>
+                    <tr>
+                      <td>Account No:</td>
+                      <td colSpan={2}>1256985621245</td>
+                    </tr>
+                    <tr>
+                      <td>Branch</td>
+                      <td colSpan={2}>Thane Branch</td>
+                    </tr>
+                    <tr>
+                      <td>IFSC Code</td>
+                      <td colSpan={2}>PSB00045</td>
+                    </tr>
+                    <tr>
+                      <td>Address</td>
+                      <td colSpan={2}>Tulsi Shyam Teen Hath Naka, Thane(W), 400604</td>
+                    </tr>
+                  </table>
+                  <table className="terminologyRightTable">
+                    <p className="sign">
+                      Omkar Creations <br/>
+                      Authorized Signatory
+                    </p>
+                  </table>
+                </div>
+                <div className="clearfix"></div>
+              </div>
+            </section>
+          </main>
+          <p style={{marginTop: 0}}>Declaration: * No Complaint regarding this bill will be entertained if not noticed in writing within 7 days.</p>
+        </div>
+      </Card>
+      ) : (
+      <></>
+      )
+    }
   </>
 );
 };

@@ -11,6 +11,7 @@ const InventoryState = (props) => {
   const [database, setDatabase] = useState(productInitial)
   const [name, setName] = useState(productInitial)
   const [profit, setProfit] = useState(productInitial)
+  const [invoices, setInvoices] = useState(productInitial)
 
   //Fetch All product
   const fetchProduct = async () => {
@@ -197,13 +198,44 @@ const InventoryState = (props) => {
       },
     });
     const json = await response.json()
-    console.log(json)
+    // console.log(json)
     setProfit(json)
   }
 
+  //Get all invoices
+  const getAllInvoices = async () => {
+    // API Call
+    const response = await fetch(`${host}/api/sale/getallinvoices`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQ4MGFjOTQ1ZDk2YWU5ZmUzOTdlN2U5In0sImlhdCI6MTY4NjIwMDYxMH0._RXLrE3g9RTlVC7MU6RMR64iOPkoioIb378qlboLFgM',
+      },
+    });
+    const json = await response.json()
+    // console.log(json)
+    setInvoices(json)
+  }
+
+  //Edit a product
+  const updateStatus = async ( id, status ) => {
+    // API Call
+    const response = await fetch(`${host}/api/sale/updateinvoicestatus/${id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQ4MGFjOTQ1ZDk2YWU5ZmUzOTdlN2U5In0sImlhdCI6MTY4NjIwMDYxMH0._RXLrE3g9RTlVC7MU6RMR64iOPkoioIb378qlboLFgM',
+      },  
+      body: JSON.stringify({status: status})
+    });
+    const json = response.json();
+    if (json) {
+      console.log("updated")
+    } 
+  }
 
   return(
-    <InventoryContext.Provider value={{product,name,database,currentProduct,user, profit,getProductById,fetchProduct,getProductByCode,addProduct,addProductToDB,fetchDatabase,getUser,deleteProduct,paymentComplete, getProfits}}>
+    <InventoryContext.Provider value={{product,name,database,currentProduct,user,profit,invoices,getProductById,fetchProduct,getProductByCode,addProduct,addProductToDB,fetchDatabase,getUser,deleteProduct,paymentComplete, getProfits, getAllInvoices, updateStatus}}>
       {/* eslint-disable-next-line react/prop-types */}
       {props.children}
     </InventoryContext.Provider>
