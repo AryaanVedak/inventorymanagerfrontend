@@ -4,7 +4,7 @@ const InventoryState = (props) => {
 
   const host = "http://localhost:5001"
   const productInitial = []
-
+  const [authToken, setAuthToken] = useState()
   const [product, setProducts] = useState(productInitial)
   const [user, setUser] = useState(productInitial)
   const [currentProduct, setCurrentProduct] = useState(productInitial)
@@ -12,6 +12,26 @@ const InventoryState = (props) => {
   const [name, setName] = useState(productInitial)
   const [profit, setProfit] = useState(productInitial)
   const [invoices, setInvoices] = useState(productInitial)
+
+  //Auth
+  const login = async (data) => {
+    console.log("adding a new product")
+
+    // API Call
+    // eslint-disable-next-line no-unused-vars
+    const response = await fetch(`${host}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQ4MGFjOTQ1ZDk2YWU5ZmUzOTdlN2U5In0sImlhdCI6MTY4NjIwMDYxMH0._RXLrE3g9RTlVC7MU6RMR64iOPkoioIb378qlboLFgM',
+      },
+      body: JSON.stringify(data)
+    });
+
+    const json = await response.json()
+    setAuthToken(json.authToken)
+    console.log(json.authToken)
+  }
 
   //Fetch All product
   const fetchProduct = async () => {
@@ -235,7 +255,7 @@ const InventoryState = (props) => {
   }
 
   return(
-    <InventoryContext.Provider value={{product,name,database,currentProduct,user,profit,invoices,getProductById,fetchProduct,getProductByCode,addProduct,addProductToDB,fetchDatabase,getUser,deleteProduct,paymentComplete, getProfits, getAllInvoices, updateStatus}}>
+    <InventoryContext.Provider value={{product,name,database,currentProduct,user,profit,invoices,authToken,getProductById,fetchProduct,getProductByCode,addProduct,addProductToDB,fetchDatabase,getUser,deleteProduct,paymentComplete, getProfits, getAllInvoices, updateStatus,login}}>
       {/* eslint-disable-next-line react/prop-types */}
       {props.children}
     </InventoryContext.Provider>
