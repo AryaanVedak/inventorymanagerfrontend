@@ -99,7 +99,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-function MainApp() {
+const MainApp = ({onLogout}) => {
 
   const history = useNavigate()
 
@@ -145,7 +145,7 @@ function MainApp() {
                   Inventory Manager
                 </Typography>
                 <IconButton aria-label="logout">
-                  <ExitToAppIcon style={{color: 'white'}}/>
+                  <ExitToAppIcon style={{color: 'white'}} onClick={() => onLogout()}/>
                 </IconButton>
               </Toolbar>
             </AppBar>

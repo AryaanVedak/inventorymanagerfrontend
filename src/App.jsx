@@ -5,15 +5,11 @@ import { useState } from "react";
 import { useContext } from 'react';
 import inventoryContext from "./context/inventory/inventoryContext";
 import { useEffect } from "react";
-import InventoryState from "./context/inventory/inventoryState";
 
 function App() {
 
-  // const context = useContext(inventoryContext)
-
-  // useEffect(() => {
-  //   console.log(context)
-  // },[context])
+  const context = useContext(inventoryContext);
+  const {logout} = context;
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [authToken, setAuthToken] = useState(null);
@@ -28,18 +24,17 @@ function App() {
   const handleLogout = () => {
     setAuthToken(null);
     setIsLoggedIn(false);
+    logout();
   };
 
   return (
-    <InventoryState>
       <div className="App">
       {!isLoggedIn ? (
         <LoginPage onLoginSuccess={handleLoginSuccess} />
       ) : (
-        <MainApp authToken={authToken} onLogout={handleLogout} />
+        <MainApp onLogout={handleLogout} />
       )}
     </div>
-    </InventoryState>
   )
 }
 
