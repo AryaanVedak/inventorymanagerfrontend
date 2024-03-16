@@ -14,6 +14,8 @@ import moment from "moment";
 import numWords from "num-words";
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import GSTBarChart from "./GSTBarChart.jsx";
+import MonthlyIncomeBarChart from "./MonthlyIncomeBarChart.jsx";
 
 
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -28,7 +30,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 const Analytics = () => {
 
   const context = useContext(inventoryContext)
-  const {profit,invoices,getProfits,getAllInvoices,updateStatus} = context
+  const {profit,invoices,analysis,getProfits,getAllInvoices,updateStatus,analyseInvoices} = context
   const [invoiceData, setInvoiceData] = useState([]);
   const [bill, setBill] = useState([]);
   const [content, setContent] = useState([]);
@@ -177,6 +179,10 @@ const Analytics = () => {
     setDownload(false)
   }
 
+  useEffect(() => {
+    analyseInvoices();
+  },[])
+
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }} style={{backgroundColor: "#F1F3F6", height: '100vh'}}>
       <DrawerHeader />
@@ -221,34 +227,84 @@ const Analytics = () => {
                 fontFamily: 'Poppins',
                 textAlign: "center",
                 marginTop: 30,
-                fontSize: 64
+                fontSize: 64,
+                color: "green"
               }}>&#8377; {profit.total}</Typography>
+            </Card>
+          </Grid>
+          <Grid item xs={4} style={{ height: 300, paddingBottom: 20 }}>
+            <Card style={{padding: '10px 20px 25px 20px'}} sx={{ borderRadius: '16px',  boxShadow: 3, marginTop: 2, height: "100%" }}>
+              <Typography style={{
+                fontWeight: "bold",
+                fontFamily: 'Poppins',
+                marginTop: 10,
+                fontSize: 28
+              }}>Most Bought Product</Typography>
+              <Typography style={{
+                fontWeight: "bold",
+                fontFamily: 'Poppins',
+                textAlign: "center",
+                marginTop: 40,
+                fontSize: 38,
+                justifyContent: "center",
+                color: "#1976D2"
+              }}>{analysis && analysis.mostBoughtProduct}</Typography>
+            </Card>
+          </Grid>
+        </Grid>
+        <Grid container spacing={2}>
+          <Grid item xs={4} style={{ paddingBottom: 20 }}>
+            <Card style={{padding: '25px 20px 25px 20px'}} sx={{ borderRadius: '16px',  boxShadow: 3, marginTop: 2, height: "100%" }}>
+              <GSTBarChart transactions={invoices && invoices}/>
+              <Typography style={{
+                fontWeight: "bold",
+                fontFamily: 'Poppins',
+                textAlign: "center",
+                marginTop: 5,
+                fontSize: 16
+              }}>GST Data by Month</Typography>
+            </Card>
+          </Grid>
+          <Grid item xs={4} style={{ paddingBottom: 20 }}>
+            <Card style={{padding: '25px 20px 25px 20px'}} sx={{ borderRadius: '16px',  boxShadow: 3, marginTop: 2, height: "100%" }}>
+              <MonthlyIncomeBarChart transactions={invoices && invoices}/>
+              <Typography style={{
+                fontWeight: "bold",
+                fontFamily: 'Poppins',
+                textAlign: "center",
+                marginTop: 5,
+                fontSize: 16
+              }}>Earnings by Month</Typography>
+            </Card>
+          </Grid>
+        </Grid>
+        <Grid container spacing={2}>
+          <Grid item xs={12} style={{ paddingBottom: 20 }}>
+            <Card style={{padding: '25px 20px 25px 20px'}} sx={{ borderRadius: '16px',  boxShadow: 3, marginTop: 2, height: "100%" }}>
+              <DataGrid
+                rows={invoiceData}
+                columns={columns}
+                getRowId={(row) => row?._id}
+                initialState={{
+                  pagination: {
+                    paginationModel: {
+                      pageSize: 5,
+                    },
+                  },
+                }}
+                pageSizeOptions={[5, 10, 20]}
+                sx={{"& .MuiDataGrid-columnHeaders": {
+                  backgroundColor: "rgba(101,47,157,0.6)",
+                  color: "rgb(255,255,255)",
+                  fontSize: 16
+                }}}
+                // checkboxSelection
+                disableRowSelectionOnClick
+              />
             </Card>
           </Grid>
         </Grid>
         <br/>
-        <Card style={{padding: '25px 20px 25px 20px'}}>
-          <DataGrid
-            rows={invoiceData}
-            columns={columns}
-            getRowId={(row) => row?._id}
-            initialState={{
-              pagination: {
-                paginationModel: {
-                  pageSize: 5,
-                },
-              },
-            }}
-            pageSizeOptions={[5]}
-            sx={{"& .MuiDataGrid-columnHeaders": {
-              backgroundColor: "rgba(101,47,157,0.6)",
-              color: "rgb(255,255,255)",
-              fontSize: 16
-            }}}
-            // checkboxSelection
-            disableRowSelectionOnClick
-          />
-        </Card>
       </Card>
       {/* Invoice */}
       {bill ? (

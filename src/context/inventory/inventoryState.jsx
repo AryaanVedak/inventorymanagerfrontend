@@ -5,6 +5,7 @@ const InventoryState = (props) => {
   const host = "http://localhost:5001"
   const productInitial = []
   const [authToken, setAuthToken] = useState()
+  const [analysis, setAnalysis] = useState()
   const [product, setProducts] = useState(productInitial)
   const [user, setUser] = useState(productInitial)
   const [currentProduct, setCurrentProduct] = useState(productInitial)
@@ -258,8 +259,22 @@ const InventoryState = (props) => {
     } 
   }
 
+  const analyseInvoices = async () => {
+    // API Call
+    const response = await fetch(`${host}/api/sale/analyseinvoices`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': authToken,
+      },
+    });
+    const json = await response.json()
+    // console.log(json)
+    setAnalysis(json)
+  }
+
   return(
-    <InventoryContext.Provider value={{product,name,database,currentProduct,user,profit,invoices,authToken,getProductById,fetchProduct,getProductByCode,addProduct,addProductToDB,fetchDatabase,getUser,deleteProduct,paymentComplete, getProfits, getAllInvoices, updateStatus,login,logout}}>
+    <InventoryContext.Provider value={{product,name,database,currentProduct,user,profit,invoices,authToken,analysis,getProductById,fetchProduct,getProductByCode,addProduct,addProductToDB,fetchDatabase,getUser,deleteProduct,paymentComplete, getProfits, getAllInvoices, updateStatus,analyseInvoices,login,logout}}>
       {/* eslint-disable-next-line react/prop-types */}
       {props.children}
     </InventoryContext.Provider>

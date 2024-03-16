@@ -141,8 +141,8 @@ const MainApp = ({onLogout}) => {
                 >
                   <MenuIcon />
                 </IconButton>
-                <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-                  Inventory Manager
+                <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }} style={{fontWeight: 'bold', fontFamily: "poppins", fontSize: "24px"}}>
+                  InventoryXpert
                 </Typography>
                 <IconButton aria-label="logout">
                   <ExitToAppIcon style={{color: 'white'}} onClick={() => onLogout()}/>

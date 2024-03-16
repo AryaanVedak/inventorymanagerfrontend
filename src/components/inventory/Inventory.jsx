@@ -141,12 +141,13 @@ const Inventory = () => {
     {
       field: 'code',
       headerName: 'Code',
-      width: 100,
+      width: 200,
     },
     {
       field: 'name',
       headerName: 'Product Name',
       flex: 1 ,
+      width: 500,
     },
     {
       field: 'costprice',
@@ -230,7 +231,7 @@ const Inventory = () => {
                 paginationModel: { page: 0, pageSize: 10 },
               },
             }}
-            pageSizeOptions={[5, 10]}
+            pageSizeOptions={[5, 10, 20, 50]}
             sx={{"& .MuiDataGrid-columnHeaders": {
                 backgroundColor: "rgba(101,47,157,0.6)",
                 color: "rgb(255,255,255)",
