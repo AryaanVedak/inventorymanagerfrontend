@@ -183,6 +183,10 @@ const Analytics = () => {
     analyseInvoices();
   },[])
 
+  useEffect(() => {
+    console.log(analysis)
+  },[analysis])
+
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }} style={{backgroundColor: "#F1F3F6", height: '100vh'}}>
       <DrawerHeader />
@@ -239,16 +243,15 @@ const Analytics = () => {
                 fontFamily: 'Poppins',
                 marginTop: 10,
                 fontSize: 28
-              }}>Most Bought Product</Typography>
+              }}>Today's Revenue</Typography>
               <Typography style={{
                 fontWeight: "bold",
                 fontFamily: 'Poppins',
                 textAlign: "center",
-                marginTop: 40,
-                fontSize: 38,
-                justifyContent: "center",
-                color: "#1976D2"
-              }}>{analysis && analysis.mostBoughtProduct}</Typography>
+                marginTop: 30,
+                fontSize: 64,
+                color: "green"
+              }}>&#8377; {analysis && analysis.todayTotalRevenue}</Typography>
             </Card>
           </Grid>
         </Grid>
@@ -276,6 +279,42 @@ const Analytics = () => {
                 fontSize: 16
               }}>Earnings by Month</Typography>
             </Card>
+          </Grid>
+          <Grid item xs={4} style={{ paddingBottom: 20 }}>
+            <Card style={{padding: '10px 20px 25px 20px'}} sx={{ borderRadius: '16px',  boxShadow: 3, marginTop: 2, height: "100%" }}>
+              <Typography style={{
+                fontWeight: "bold",
+                fontFamily: 'Poppins',
+                marginTop: 10,
+                fontSize: 28
+              }}>Most Bought Product</Typography>
+              <Typography style={{
+                fontWeight: "bold",
+                fontFamily: 'Poppins',
+                textAlign: "center",
+                marginTop: 40,
+                fontSize: 38,
+                justifyContent: "center",
+                color: "#1976D2"
+              }}>{analysis && analysis.mostBoughtProduct}</Typography>
+            </Card>
+            {/* <Card style={{padding: '10px 20px 25px 20px'}} sx={{ borderRadius: '16px',  boxShadow: 3, marginTop: 2, height: "48%" }}>
+              <Typography style={{
+                fontWeight: "bold",
+                fontFamily: 'Poppins',
+                marginTop: 10,
+                fontSize: 28
+              }}>Most Bought Product</Typography>
+              <Typography style={{
+                fontWeight: "bold",
+                fontFamily: 'Poppins',
+                textAlign: "center",
+                marginTop: 40,
+                fontSize: 38,
+                justifyContent: "center",
+                color: "#1976D2"
+              }}>{analysis && analysis.mostBoughtProduct}</Typography>
+            </Card> */}
           </Grid>
         </Grid>
         <Grid container spacing={2}>
